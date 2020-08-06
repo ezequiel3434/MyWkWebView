@@ -46,7 +46,7 @@ final class ViewController: UIViewController {
         webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
         view.addSubview(webView)
-        load(url: "http://www.google.com")
+        load(url: "https://www.google.com")
         
     }
 
