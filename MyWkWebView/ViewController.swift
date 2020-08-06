@@ -19,6 +19,8 @@ final class ViewController: UIViewController {
     private let searchBar = UISearchBar()
     private var webView: WKWebView!
     private let refreshCOntrol = UIRefreshControl()
+    private let baseUrl = "https://www.google.com"
+    private let searchPath = "/search?q="
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,7 +47,7 @@ final class ViewController: UIViewController {
         
         webView = WKWebView(frame: view.frame, configuration: webViewConf)
         webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
+        webView.scrollView.keyboardDismissMode = .onDrag
         view.addSubview(webView)
         
         webView.navigationDelegate = self
@@ -56,7 +58,7 @@ final class ViewController: UIViewController {
         webView.scrollView.addSubview(refreshCOntrol)
         view.bringSubviewToFront(refreshCOntrol)
         
-        load(url: "https://www.google.com")
+        load(url: baseUrl)
         
     }
 
@@ -70,8 +72,17 @@ final class ViewController: UIViewController {
     
     //MARK: Private methods
     private func load( url:String ){
-        print("hola")
-        webView.load(URLRequest(url: URL(string: url)!))
+        
+        var urlToLoad: URL!
+        
+        if let url = URL(string: url), UIApplication.shared.canOpenURL(url){
+            urlToLoad = url
+        } else {
+            urlToLoad = URL(string:"\(baseUrl)\(searchPath)\(url)")!
+        }
+        
+        
+        webView.load(URLRequest(url: urlToLoad))
     }
     @objc private func reload(){
         webView.reload()
@@ -84,6 +95,7 @@ final class ViewController: UIViewController {
 extension ViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.endEditing(true)
+        load(url: searchBar.text ?? "")
     }
 }
 
@@ -98,6 +110,7 @@ extension ViewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         refreshCOntrol.beginRefreshing()
+        searchBar.text = webView.url?.absoluteString
     }
     
 }
