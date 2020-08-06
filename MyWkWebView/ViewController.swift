@@ -61,9 +61,11 @@ final class ViewController: UIViewController {
     }
 
     @IBAction func backBtnAction(_ sender: Any) {
+        webView.goBack()
     }
     
     @IBAction func fowardBtnAction(_ sender: Any) {
+        webView.goForward()
     }
     
     //MARK: Private methods
@@ -90,6 +92,8 @@ extension ViewController: UISearchBarDelegate {
 extension ViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         refreshCOntrol.endRefreshing()
+        backBtn.isEnabled = webView.canGoBack
+        fowardBtn.isEnabled = webView.canGoForward
     }
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
