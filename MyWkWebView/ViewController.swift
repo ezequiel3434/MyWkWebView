@@ -18,6 +18,7 @@ final class ViewController: UIViewController {
     // MARK: -Privates
     private let searchBar = UISearchBar()
     private var webView: WKWebView!
+    private let refreshCOntrol = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,6 +47,15 @@ final class ViewController: UIViewController {
         webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
         view.addSubview(webView)
+        
+        webView.navigationDelegate = self
+        
+        // Refresh control
+        
+        refreshCOntrol.addTarget(self, action: #selector(reload), for: .valueChanged)
+        webView.scrollView.addSubview(refreshCOntrol)
+        view.bringSubviewToFront(refreshCOntrol)
+        
         load(url: "https://www.google.com")
         
     }
@@ -61,6 +71,9 @@ final class ViewController: UIViewController {
         print("hola")
         webView.load(URLRequest(url: URL(string: url)!))
     }
+    @objc private func reload(){
+        webView.reload()
+    }
     
 }
 
@@ -70,4 +83,17 @@ extension ViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.endEditing(true)
     }
+}
+
+// MARK: -WKNavigationDelegate
+
+extension ViewController: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        refreshCOntrol.endRefreshing()
+    }
+    
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        refreshCOntrol.beginRefreshing()
+    }
+    
 }
